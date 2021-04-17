@@ -1,0 +1,50 @@
+Install mysqlclient set it up
+install nginx, php, wp
+
+Installing Certbot
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get update
+sudo apt-get install python-certbot-nginx
+
+Setting up Nginx
+sudo nano /etc/nginx/sites-available/default
+Find the existing server_name line and replace the underscore, _, with your domain name:
+. . .
+server_name example.com www.example.com;
+. . .
+sudo nginx -t
+sudo systemctl reload nginx
+
+Obtaining an SSL Certificate
+sudo certbot --nginx -d example.com -d www.example.com
+sudo certbot renew --dry-run
+
+Adjusting Nginx Configuration
+Enable SSL for example.com
+server {
+    listen 443;
+    server_name example.com;
+    ssl on;
+    ssl_certificate /var/www/example.com/cert/example.com.crt;
+    ssl_certificate_key /var/www/example.com/cert/example.com.key;
+ #... other stuff
+}
+
+Add following codes if you want to force SSL on your site.
+
+server {
+    listen 80;
+    server_name example.com;
+    return 301 https://example.com$request_uri;
+}
+service nginx reload
+
+Ask WordPress to use SSL
+Add following to you WordPress’s wp-config.php file.
+
+To force SSL for login form:
+
+define('FORCE_SSL_LOGIN', true);
+To force SSL for wp-admin section:
+
+define('FORCE_SSL_ADMIN', true);
